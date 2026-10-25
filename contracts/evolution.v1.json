@@ -1,6 +1,6 @@
 {
   "contract_id": "taskmanagent.evolution",
-  "version": "1.1.0-design",
+  "version": "1.2.0-design",
   "status": "selected_design_pending_implementation_validation",
   "scope": "How future AI work finds its owner, limits context, validates changes and reverses decisions.",
   "sources_of_truth": {
@@ -8,6 +8,7 @@
     "module_ownership_and_dependency_graph": "contracts/architecture.v1.json",
     "change_routes_and_acceptance_scenarios": "contracts/evolution.v1.json",
     "decision_rationale_and_revisit_triggers": "contracts/decisions.v1.json",
+    "development_workflow": "CONTRIBUTING.md",
     "actual_implementation": "Source code and executable checks when created; contracts describe required behavior, not implemented status."
   },
   "design_validation": {
@@ -15,11 +16,12 @@
     "checker": "tools/check_contracts.py",
     "regression_command": "python3 -m unittest discover -s tests -v",
     "regression_tests": "tests/test_contracts.py",
-    "implemented_checks": ["Strict JSON parsing and required design-record shapes", "Local references and JSON pointers", "Unique identifiers and data-class ownership", "Acyclic declared module dependencies", "Route owners, scenario links and decision links", "Synthetic source locators, quoted evidence and expected-claim references"],
+    "ci_workflow": ".github/workflows/design-checks.yml",
+    "implemented_checks": ["Strict JSON parsing and required design-record shapes", "Local references and JSON pointers", "Unique identifiers and data-class ownership", "Acyclic declared module dependencies", "Route owners, scenario links and decision links", "Structured stage gate/scenario references and implemented-gate evidence paths", "Synthetic source locators, quoted evidence and expected-claim references"],
     "limits": "These checks validate design consistency and fixture integrity. They do not inspect product imports, execute a parser or model, prove semantic support, or demonstrate persistence/authority enforcement; G01-G05 and the remaining G06 work still require implementation."
   },
   "context_protocol": [
-    "Read the entry contract and choose a change route; determine whether the request changes behavior, interpretation, data, presentation or authority.",
+    "Follow CONTRIBUTING.md for Git, experiments, research, autonomy, review and delivery. Read the entry contract and choose a change route; determine whether the request changes behavior, interpretation, data, presentation or authority. Repository tooling/workflow changes follow design_validation without inventing a product-domain owner.",
     "Read the owner module, its public contracts and relevant decisions. Read immediate consumers only if their contract or observable behavior may change.",
     "Build a small change record with goal, affected owners/contracts, acceptance evidence and rollback method; a normal issue or PR body is sufficient for ordinary work.",
     "If no route fits, add a specific owner or amend an existing boundary with rationale before implementing. Do not place new behavior in a global utils/service bucket.",
@@ -90,13 +92,15 @@
     {"id": "S15", "given": "An owner note references a source or interpreted entity", "when": "Analysis is replaced, disposable indexes are deleted, or the entity splits or merges", "then": "The original anchor and note survive. Supported continuity may retain identity; ambiguous mappings remain explicitly unresolved until a revisioned owner association, without silent note reassignment."}
   ],
   "validation_sequence": [
-    {"stage": "architecture_design", "deliverable": "These contracts, local design checker, reviewed synthetic quality expectations, change routes and decision rationale.", "exit": "The design checker and its regression tests pass. References, declared dependencies and scenario routing are checked; no runtime capability or explanation quality pass is claimed."},
-    {"stage": "foundation_proof", "deliverable": "Minimal headless slice: repository snapshot, one supported analyzer, evidence query and revisioned idea persistence, plus a bounded desktop packaging/graph performance spike.", "exit": "G01/G02/G06 exist; S01/S02/S03/S07/S10 pass for implemented scope. Confirm first source language, target OS and measured graph limits before committing to broad features."},
-    {"stage": "owner_understanding", "deliverable": "Focused desktop map, evidence drill-down, ideas, retained adoption, fresh/stale status and fast/deep inference ports.", "exit": "The first-delivery success checks pass against reviewed synthetic and selected real-repository examples; the owner can explain capabilities and uncertainty. AI/provider permissions are explicit; S04/S08/S09/S13/S14/S15 pass for applicable implemented scope."},
-    {"stage": "planning_and_verification", "deliverable": "Revisioned scenarios, plans, task handoff and criterion-linked results.", "exit": "S05/S06 pass; changing a decision visibly invalidates dependent assumptions without deleting history."},
-    {"stage": "broader_integrations", "deliverable": "Additional languages, repositories, runtime evidence or explicitly authorized execution, selected by demonstrated need.", "exit": "Each adapter passes its boundary fixtures and applicable authority/recovery scenarios; no automatic all-language or all-platform claim."}
+    {"stage": "architecture_design", "deliverable": "These contracts, local design checker, reviewed synthetic quality expectations, change routes and decision rationale.", "gate_refs": [], "scenario_refs": [], "exit": "The design checker and its regression tests pass. References, declared dependencies and scenario routing are checked; no runtime capability or explanation quality pass is claimed."},
+    {"stage": "foundation_proof", "deliverable": "Minimal headless slice: repository snapshot, one supported analyzer, evidence query and revisioned idea persistence, plus a bounded desktop packaging/graph performance spike.", "gate_refs": ["G01", "G02", "G03", "G04", "G05", "G06"], "scenario_refs": ["S01", "S02", "S03", "S07", "S09", "S10"], "exit": "Referenced gates and scenarios pass for implemented scope, including collection authority before the first scan and restore for persisted owner data. Confirm first source language, target OS and measured graph limits before committing to broad features."},
+    {"stage": "owner_understanding", "deliverable": "Focused desktop map, evidence drill-down, ideas, retained adoption, fresh/stale status and fast/deep inference ports.", "gate_refs": ["G01", "G02", "G03", "G04", "G05", "G06"], "scenario_refs": ["S04", "S08", "S09", "S13", "S14", "S15"], "exit": "The first-delivery success checks and referenced scenarios pass against reviewed synthetic and selected real-repository examples; the owner can explain capabilities and uncertainty. AI/provider permissions are explicit; apply referenced gates to implemented integrations."},
+    {"stage": "planning_and_verification", "deliverable": "Revisioned scenarios, plans, task handoff and criterion-linked results.", "gate_refs": ["G01", "G02", "G03", "G04", "G06"], "scenario_refs": ["S05", "S06"], "exit": "Referenced gates and scenarios pass for implemented scope; changing a decision visibly invalidates dependent assumptions without deleting history."},
+    {"stage": "broader_integrations", "deliverable": "Additional languages, repositories, runtime evidence or explicitly authorized execution, selected by demonstrated need.", "gate_refs": ["G01", "G02", "G03", "G04", "G05", "G06"], "scenario_refs": ["S03", "S04", "S06", "S07", "S08", "S09", "S10", "S11", "S12", "S13", "S15"], "exit": "Each adapter passes its boundary fixtures and applicable cases from the referenced scenarios and gates; record why other cases are inapplicable. No automatic all-language or all-platform claim."}
   ],
   "acceptance_application": {
+    "stage_references": "Store stage gate/scenario IDs only in gate_refs and scenario_refs, not free-text deliverable/exit fields. These are required checks for the relevant implemented scope, not proof of completion or an inflexible task order. Record passed, failed, unexecuted and inapplicable cases at a specific revision.",
+    "gate_evidence": "A gate marked implemented must link existing executable checks through implementation_evidence_refs. File existence only validates the declaration; a dated run result at the reviewed revision is still needed for acceptance.",
     "scope": "Record the implemented slice, applicable scenario cases, deferred integrations and evidence at a specific revision. A deferred or unexecuted case is not a pass, and synthetic examples do not replace final reference-repository acceptance.",
     "quality_review": "Check required facts and forbidden conclusions, then review whether cited evidence actually supports capability interpretations. Allow equivalent plain-Chinese wording and differing valid groupings; do not require exact AI prose or graph layouts.",
     "experiment_exit": "Before a bounded packaging, graph or analyzer prototype, record the question, relevant environment, acceptance evidence and stop condition. Confirm measured limits before broadening scope; retire temporary code and fixtures that no longer serve a retained behavior."

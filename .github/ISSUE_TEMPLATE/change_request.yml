@@ -1,0 +1,22 @@
+name: 改进 / Change
+description: 提出用户目标、工程改进或需要验证的设计假设。
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 需要解决什么问题
+      description: 描述目标、具体场景和当前不足。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 如何判断有帮助
+      description: 提供验收例子、可观察结果或实验问题。
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: 范围与取舍
+      description: 已知限制、可参考的方案、需要的输入；不必预先决定实现。

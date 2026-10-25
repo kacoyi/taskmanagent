@@ -1,0 +1,25 @@
+name: 缺陷 / Bug
+description: 报告设计矛盾、工具错误或文档问题。
+body:
+  - type: markdown
+    attributes:
+      value: 当前处于设计阶段。敏感问题请使用 Security 页的私密报告。
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题与预期
+      description: 实际发生了什么，预期是什么？
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 最小复现与证据
+      description: 提供相关契约路径、命令、合成样例或去除敏感信息后的输出。
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 版本与环境
+      description: 提交号，以及适用的操作系统和 Python 版本。

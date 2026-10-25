@@ -96,7 +96,9 @@ def walk_references(root, docs, value, scenarios):
     elif isinstance(value, list):
         for child in value:
             walk_references(root, docs, child, scenarios)
-    elif isinstance(value, str) and value.startswith(("contracts/", "tools/", "tests/")):
+    elif isinstance(value, str) and (
+            value.startswith(("contracts/", "tools/", "tests/", ".github/"))
+            or value in ("AGENTS.md", "CONTRIBUTING.md", "README.md", "SECURITY.md", "LICENSE")):
         resolve_reference(root, docs, value)
 
 
@@ -229,14 +231,27 @@ def check_contracts(root):
         require(bool(strings(decision.get("alternatives"), decision["id"] + ".alternatives")), "missing decision alternatives")
     for ref in strings(architecture.get("decision_refs"), "decision_refs"):
         require(ref in adrs, "unknown decision: " + ref)
-    for gate in records(evolution.get("architecture_gates"), "architecture_gates").values():
+    gates = records(evolution.get("architecture_gates"), "architecture_gates")
+    for gate in gates.values():
         for field in ("name", "required_before", "check"):
             nonempty(gate.get(field), gate["id"] + "." + field)
         require(gate.get("implementation_status") in ("not_implemented", "design_checks_only", "implemented"),
                 gate["id"] + ": invalid implementation status")
+        if gate["implementation_status"] == "implemented":
+            refs = strings(gate.get("implementation_evidence_refs"), gate["id"] + ".implementation_evidence_refs")
+            require(bool(refs), gate["id"] + ": missing implementation evidence")
+            for ref in refs:
+                resolve_reference(root, docs, ref)
     for stage in records(evolution.get("validation_sequence"), "validation_sequence", "stage").values():
         for field in ("deliverable", "exit"):
-            nonempty(stage.get(field), stage["stage"] + "." + field)
+            value = nonempty(stage.get(field), stage["stage"] + "." + field)
+            require(re.search(r"\b[GS][0-9]+\b", value) is None,
+                    stage["stage"] + ": use structured gate_refs/scenario_refs, not IDs in prose")
+        for field, targets in (("gate_refs", gates), ("scenario_refs", scenarios)):
+            refs = strings(stage.get(field), stage["stage"] + "." + field)
+            require(all(ref in targets for ref in refs), stage["stage"] + ": unknown " + field)
+            require(bool(refs) or stage["stage"] == "architecture_design",
+                    stage["stage"] + ": missing " + field)
     delivery = engineering.get("first_delivery_scope")
     require(isinstance(delivery, dict), "first_delivery_scope: expected an object")
     nonempty(delivery.get("outcome"), "first_delivery_scope.outcome")
