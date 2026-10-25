@@ -1,0 +1,244 @@
+{
+  "contract_id": "taskmanagent.architecture",
+  "version": "1.1.0-design",
+  "status": "selected_design_pending_implementation_validation",
+  "implementation_status": "not_started",
+  "purpose": "Keep frequent changes and discarded experiments inexpensive over the product lifetime; make major changes explicit and controlled while preserving owner data.",
+  "priority_order": [
+    "Preserve owner intent and trustworthy evidence.",
+    "Make changes local, observable, testable and reversible where possible.",
+    "Keep the amount of context needed for a change bounded.",
+    "Deliver useful desktop behavior with a small operational footprint.",
+    "Optimize scale only against measured constraints."
+  ],
+  "decision_refs": ["ADR-001", "ADR-002", "ADR-003", "ADR-004", "ADR-005", "ADR-006", "ADR-007", "ADR-008"],
+  "change_cost_policy": {
+    "cheap_by_priority": ["Revise owner ideas", "Change interpretations and prompts", "Replace a provider or supported parser", "Adjust views and graph presentation", "Discard a bounded prototype"],
+    "controlled_cost": ["Move domain ownership", "Migrate persistent records", "Rewrite a module or product language", "Reconcile future external effects"],
+    "abstraction_rule": "Add a boundary for a concrete trust/dependency boundary or observed change pressure. Expected savings must justify the code, tests and compatibility burden; universal cheap change is not a requirement.",
+    "experiment_rule": "Record the question, bounded scope, success/failure evidence and retirement condition in the ordinary change record. Keep experimental output disposable unless explicitly adopted; remove unsuccessful or retired implementations.",
+    "measurement": "Review recurring cross-owner edits, time spent recovering failed experiments and migration burden. Set targets from actual work; do not substitute interface counts or arbitrary file quotas for change cost."
+  },
+  "shape": {
+    "style": "Local-first modular monolith; explicit ports at actual external dependencies; feature-oriented code inside each module.",
+    "default_processes": "One desktop host with background jobs. Use a separate collector only across a real OS boundary or for measured isolation needs.",
+    "deployment": "Installed desktop application; no browser UI or mandatory cloud backend.",
+    "no_initial_platforms": ["microservices", "general plugin marketplace", "distributed event broker", "universal workflow engine", "full event sourcing", "mandatory graph database", "mandatory vector database"],
+    "extension_rule": "Add a typed seam for an observed replacement or trust boundary; do not make every class an interface.",
+    "module_rule": "A module is a cohesive responsibility and data owner, not a separate service. Split or merge boundaries when change evidence warrants it."
+  },
+  "module_catalog": [
+    {
+      "id": "foundation",
+      "planned_path": "src/Foundation",
+      "owns": ["Opaque IDs", "Revision tokens", "Small error/result values"],
+      "public_contracts": ["RepositoryId", "SnapshotId", "EntityRef", "Revision", "ErrorCode"],
+      "allowed_dependencies": [],
+      "forbidden_responsibilities": ["Domain entities", "Global mutable state", "Business services", "Generic repository framework"],
+      "creation_stage": "first_slice"
+    },
+    {
+      "id": "evidence",
+      "planned_path": "src/Modules/Evidence",
+      "owns": ["Repository registration", "Source snapshots", "Observations", "Evidence provenance", "Collection coverage", "Source identity reconciliation", "Retained source identity anchors and pinned evidence"],
+      "public_contracts": ["RegisterRepository", "PublishSnapshot", "ReadSnapshot", "ResolveEvidence", "RetainSourceAnchor", "PinEvidence", "RepositorySourcePort", "LanguageAnalyzerPort"],
+      "allowed_dependencies": ["foundation"],
+      "forbidden_responsibilities": ["Business recommendations", "User intent", "Direct execution of repository scripts"],
+      "creation_stage": "first_slice"
+    },
+    {
+      "id": "understanding",
+      "planned_path": "src/Modules/Understanding",
+      "owns": ["Capability and module hypotheses", "Typed dependency projections", "Explanations", "Findings", "Analysis lineage", "Referenced interpretation identity anchors and mappings", "Exact retained adopted analysis outputs"],
+      "public_contracts": ["AnalyzeSnapshot", "ReadProjectMap", "ReadImpact", "RetainEntityAnchor", "RetainAnalysis", "InferencePort"],
+      "allowed_dependencies": ["foundation", "evidence"],
+      "forbidden_responsibilities": ["Editing observed source facts", "Adopting owner decisions", "Task execution"],
+      "creation_stage": "first_slice"
+    },
+    {
+      "id": "intent",
+      "planned_path": "src/Modules/Intent",
+      "owns": ["Ideas", "Owner annotations and corrections", "Desired structures", "Scenario revisions", "Owner decisions", "Adopted recommendation records"],
+      "public_contracts": ["CaptureIdea", "ReviseScenario", "AdoptDecision", "SupersedeDecision", "ReadIntent"],
+      "allowed_dependencies": ["foundation"],
+      "forbidden_responsibilities": ["Overwriting observations", "Automatically approving its own recommendations", "Owning graph renderer state"],
+      "creation_stage": "first_slice"
+    },
+    {
+      "id": "verification",
+      "planned_path": "src/Modules/Verification",
+      "owns": ["Criterion evaluation records", "Verification runs", "Release observations", "Runtime observations"],
+      "public_contracts": ["RecordVerification", "ReadVerification", "VerificationEvidencePort"],
+      "allowed_dependencies": ["foundation", "evidence"],
+      "forbidden_responsibilities": ["Changing acceptance criteria", "Prioritizing work", "Executing deployments as a side effect of reading status"],
+      "creation_stage": "planning_slice"
+    },
+    {
+      "id": "planning",
+      "planned_path": "src/Modules/Planning",
+      "owns": ["Plan revisions", "Work items", "Acceptance criteria definitions", "Dependency ordering", "Progress projections"],
+      "public_contracts": ["ProposePlan", "RevisePlan", "ReadWork", "AssessProgress", "PlanningInferencePort"],
+      "allowed_dependencies": ["foundation", "intent", "understanding", "verification"],
+      "forbidden_responsibilities": ["Rewriting verification results", "Changing owner intent", "Direct source modification"],
+      "creation_stage": "planning_slice"
+    },
+    {
+      "id": "application",
+      "planned_path": "src/Application",
+      "owns": ["Explicit use-case orchestration", "Job lifecycle", "Access and budget policy", "Composite view queries", "Command deduplication", "Transaction coordination"],
+      "public_contracts": ["DesktopApplicationApi", "AdoptExplanation", "AttachIdea", "JobStatus", "AccessPolicy", "BudgetPolicy", "UnitOfWorkPort", "JobStorePort", "SecretStorePort"],
+      "allowed_dependencies": ["foundation", "evidence", "understanding", "intent", "verification", "planning"],
+      "forbidden_responsibilities": ["Domain decision rules", "UI layout", "Provider SDK types", "Unbounded generic agent loops"],
+      "creation_stage": "first_slice"
+    },
+    {
+      "id": "desktop",
+      "planned_path": "src/Desktop",
+      "owns": ["Views", "View models", "Graph rendering and layout", "Navigation", "Presentation preferences"],
+      "public_contracts": ["Desktop entry views"],
+      "allowed_dependencies": ["foundation", "application"],
+      "forbidden_responsibilities": ["SQL", "Source scanning", "Domain rules", "AI provider calls"],
+      "creation_stage": "first_slice"
+    },
+    {
+      "id": "adapters",
+      "planned_path": "src/Adapters",
+      "owns": ["Filesystem and Git access", "Language parser integrations", "AI provider integrations", "SQLite persistence", "Optional collector transport", "Future external execution and telemetry integrations"],
+      "public_contracts": ["Implementations of consumer-owned ports", "Adapter registration"],
+      "allowed_dependencies": ["foundation", "evidence", "understanding", "intent", "verification", "planning", "application"],
+      "forbidden_responsibilities": ["Cross-module table writes outside owner-specific repositories", "Business rules", "Implicit grants of authority"],
+      "creation_stage": "first_slice"
+    },
+    {
+      "id": "host",
+      "planned_path": "src/Hosts",
+      "owns": ["Composition roots", "Process startup and shutdown", "Platform packaging", "Adapter selection"],
+      "public_contracts": ["Desktop executable", "Optional collector executable"],
+      "allowed_dependencies": ["foundation", "evidence", "understanding", "intent", "verification", "planning", "application", "desktop", "adapters"],
+      "forbidden_responsibilities": ["Domain rules", "Business persistence outside application use cases"],
+      "creation_stage": "first_slice"
+    }
+  ],
+  "dependency_semantics": {
+    "direction": "A -> B means A may compile against B's published contracts; never B's internals.",
+    "granularity": "Catalog edges are upper bounds. Concrete project references must be narrower. Each adapter depends only on the ports it implements.",
+    "internal_visibility": "Hide implementation types. Use project/namespace checks to enforce contract-only references; do not publish all types merely for test convenience.",
+    "composition": "Only hosts choose concrete adapters. Modules and application never reference adapter implementations.",
+    "features": "Within a module group code by use case, with local implementation details. Avoid repository-wide Controllers/Services/Models directories.",
+    "shared_types": "Share identity primitives only. Map boundary DTOs deliberately; do not pass mutable domain entities or a universal graph object everywhere.",
+    "cross_module_work": "Application invokes typed owner operations in explicit order. Use typed read contracts for queries; no implicit event chains for ordinary use cases.",
+    "ui_boundary": "Application returns presentation-neutral response DTOs using its own contracts and Foundation values; do not leak module entities, database records or provider DTOs into Desktop.",
+    "package_count": "Do not generate one project per catalog entry automatically. Introduce contract assemblies where needed to enforce the chosen dependency rules."
+  },
+  "data_model": {
+    "classes": [
+      {"id": "observed", "owner": "evidence", "meaning": "What a source or analyzer reported at a specific snapshot; observations remain bounded by coverage and tool limitations."},
+      {"id": "interpreted", "owner": "understanding", "meaning": "Replaceable, evidence-linked explanations or hypotheses; never silently promoted to observations."},
+      {"id": "desired", "owner": "intent", "meaning": "Owner ideas, corrections, alternatives and decisions; revisions survive analysis replacement."},
+      {"id": "planned", "owner": "planning", "meaning": "Revisioned proposals and work derived from a chosen desired state; priority changes preserve history."},
+      {"id": "verified", "owner": "verification", "meaning": "Recorded result for an explicit criterion revision, subject snapshot and environment; not a blanket completion assertion."}
+    ],
+    "identity": "RepositoryId is independent of root path; EntityRef combines repository and stable ID. Paths and labels are attributes, not primary identities.",
+    "rename": "Preserve identity when evidenced; retain old-to-new mappings and flag ambiguous matches. Do not move owner notes to guessed targets silently.",
+    "identity_lifecycle": [
+      {"kind": "source_entity", "owner": "evidence", "rule": "Allocate source identity independently of path and retain minimal anchors/mappings while referenced by owner records; disposable source indexes do not own those anchors."},
+      {"kind": "interpreted_entity", "owner": "understanding", "rule": "Allocate repository-scoped hypothesis IDs independently of graph layout or model-generated labels. Retain the original anchor and analysis revision when an owner record references it; AttachIdea coordinates this retention with Intent."},
+      {"kind": "desired_entity", "owner": "intent", "rule": "Allocate owner-defined identities without requiring an observed source entity; subsequent source links are revisioned associations."}
+    ],
+    "reinterpretation_identity": "Reuse an interpretation ID only with supported continuity. Record split/merge candidates as mappings; ambiguous or one-to-many changes retain the original historical reference and remain unresolved until an owner selects a revisioned association. Never fan out or reassign notes silently.",
+    "idea_attachment": "Application.AttachIdea uses one unit of work to retain the target anchor through Evidence.RetainSourceAnchor or Understanding.RetainEntityAnchor and record the revisioned association through Intent.CaptureIdea. Intent stores the reference without importing those modules; a failed attachment leaves no dangling owner association.",
+    "cross_repository": "Each end of a link carries its own RepositoryId, SnapshotId and freshness. No claim of an atomic global repository snapshot.",
+    "required_provenance": ["source_locator", "snapshot_id", "content_hash", "analyzer_or_provider_version", "captured_at", "coverage", "limitations"],
+    "intent_revision_fields": ["id", "revision", "parent_revision", "author", "created_at", "reason", "entity_refs", "supersedes"],
+    "analysis_lineage": ["source_snapshot", "input_evidence_refs", "analyzer_version", "prompt_version", "model_identity", "configuration_hash", "output_schema_version", "run_id"],
+    "boundary_rule": "Typed records are authoritative. Graph nodes, layouts, search indexes and status cards are projections; changing their presentation does not redefine domain identity.",
+    "criteria": "Planning owns criterion definitions and immutable revision/hash. Verification receives a value copy plus reference/hash, and records results independently; no reverse dependency on Planning.",
+    "historical_evidence": "A reference alone is not a retained copy. Pin the permitted excerpts/artifacts needed by adopted decisions and verification; expose missing/expired source evidence explicitly.",
+    "privacy_and_retention": "Retention and user-directed deletion override audit retention. If evidence is deliberately purged, retain only permitted metadata and mark dependent claims unverifiable; never promise indefinite recoverability."
+  },
+  "evidence_backed_adoption": {
+    "coordinator": "application",
+    "record_owners": {"output": "understanding", "pinned_evidence": "evidence", "decision": "intent"},
+    "steps": [
+      "AdoptExplanation names a command ID, exact analysis revision, selected entity references and expected owner revision. Return an existing result for an identical completed command; reject command-ID reuse with a different payload. Validate evidence references, scope, retention permission and input availability without rerunning a model.",
+      "Prepare, hash and finalize permitted retained artifacts outside the database write transaction using the storage artifact protocol.",
+      "Within one application unit of work, recheck revisions and permissions, invoke Evidence.PinEvidence, Understanding.RetainAnalysis and Intent.AdoptDecision, and record command completion plus any dependent job intent.",
+      "Return the committed decision and retained output revisions. Retrying the same command cannot create duplicate adoption records."
+    ],
+    "failure": "A conflict, missing required input or denied retention aborts all canonical adoption changes. Finalized unreferenced files may remain for garbage collection; they do not imply adoption succeeded.",
+    "limits": "This flow is for adopting evidence-backed analysis. User-authored ideas or decisions may be recorded independently without fabricated provenance; later permitted deletion marks affected claims unverifiable. Semantic evidence support requires reviewed behavior evaluations in addition to reference validation."
+  },
+  "storage": {
+    "choice": "SQLite for local canonical records, plus versioned artifact files for large data where needed.",
+    "canonical": "Owner-authored intent, decisions, accepted plans, verification history, referenced entity anchors and identity mappings, pinned evidence, adopted analysis outputs, configuration references and jobs.",
+    "derived": "Unadopted analysis, source indexes, dependency projections, search caches and graph layouts may be rebuilt or regenerated.",
+    "ai_reproducibility": "Regenerating an AI result is not deterministic replay. Preserve the exact adopted output and its lineage instead of relying on rerunning a model.",
+    "ownership": "One host is the canonical writer. Modules own table namespaces and migrations; owner-specific persistence adapters use shared transaction infrastructure.",
+    "change_ownership": "The affected data owner defines record semantics, compatibility and migration. Adapters implement engine/serialization mechanics; Application coordinates multi-owner transactions. Read only affected stores and consumers unless a shared engine change demonstrates wider impact.",
+    "atomicity": "Commit canonical owner state, revision/audit record and dependent job intent in one local transaction where required. A composite operation uses the application unit of work and owner APIs, not foreign table writes.",
+    "artifact_commit": "Write new artifacts to temporary files, hash and atomically finalize them, then commit the canonical reference. Protect pending artifacts from garbage collection until the transaction outcome is known; reconcile interrupted writes on restart. Coordinate pin/deletion changes through the owning APIs. Garbage-collect unreferenced files; never assume a filesystem rename and SQL commit are one atomic operation.",
+    "cache_loss": "After a cache loss, rebuild projections from canonical records and available source snapshots; mark unavailable historical input instead of reconstructing imaginary facts.",
+    "concurrency": "Expected-revision checks protect owner edits; serialized short write transactions avoid holding database locks during scanning or AI calls.",
+    "backup": "Use consistent SQLite backup facilities and a manifest for referenced retained artifacts; verify hashes and restore into a fresh profile. Do not copy an active database file alone.",
+    "export": "Offer versioned implementation-independent JSON records plus retained artifact manifest, with stable IDs and explicit schema versions. Export is for portability; it is not a second live source of truth.",
+    "migration": "Prefer additive changes, backfill and compatibility readers. Record minimum reader/writer versions. Refuse an incompatible older writer; back up before destructive migration.",
+    "schema_rollback": "Rollback code only when the stored schema remains compatible. Otherwise use a tested forward fix or restore with explicit accounting for post-backup edits.",
+    "wsl_rule": "Keep the database on the writer host's local filesystem. A WSL collector never opens the Windows database through a mounted/network path."
+  },
+  "refresh_pipeline": {
+    "steps": [
+      "A file/Git event marks the selected repository dirty; periodic/startup reconciliation covers missed events.",
+      "Collect immutable permitted input and create a snapshot with content identity and coverage. Detect files changing during collection and retry or mark the capture partial.",
+      "Publish deterministic supported observations atomically for that snapshot.",
+      "Build structural projections; show supported facts while semantic interpretation remains pending.",
+      "Schedule bounded AI interpretation only for affected input; validate output before storing it as interpreted data.",
+      "Overlay selected owner scenario and current planning/verification views without rewriting underlying observations."
+    ],
+    "snapshot_definition": "Commit identity alone is insufficient: include worktree changes, selected untracked content, exclusions and analyzer input hashes. Do not claim a moving live directory is an atomic snapshot.",
+    "invalidation": "Track artifact-to-input dependencies; if impact is uncertain, invalidate the affected repository projection rather than silently retaining it as current.",
+    "publication": "Use run/snapshot and expected-current-generation checks. Old results can remain historical, but cannot overwrite a newer projection.",
+    "view_consistency": "Expose structural and semantic generations separately. A composite response names its source snapshots and pending/partial/stale components.",
+    "job_states": ["queued", "running", "succeeded", "failed", "cancelled", "superseded", "outcome_unknown"],
+    "job_semantics": "Persist intent and completion state. Assume at-least-once scheduling with idempotent publication; do not claim exactly-once external requests.",
+    "restart": "Recover interrupted jobs, reconcile repository state and retry only operations known to be safe. External requests with unknown outcome require reconciliation.",
+    "limits": "Bound queue size, worker concurrency, input size and retries; coalesce obsolete refresh work; keep user actions responsive.",
+    "diagnostics": "Correlate commands, snapshots, runs and artifact IDs; keep structured local logs with content/secret redaction and bounded retention."
+  },
+  "ai_boundary": {
+    "roles": {"fast": "Local explanations, simple evidence-grounded questions and idea structuring.", "deep": "Cross-module impact, alternative designs, disputed interpretations and planning."},
+    "selection": "Roles are capability profiles, not fixed providers or model counts. One model may serve both; map roles after representative evaluations.",
+    "context": "Retrieve relevant evidence and owner decisions through read contracts. Both roles may inspect original evidence; a fast summary is not the sole deep-model input.",
+    "routing": "Use task type, scope, uncertainty and failed validation; bound escalation. High-impact recommendations require deeper evidence review regardless of fast-model confidence.",
+    "output": "Require versioned typed output, existing evidence references, scope and uncertainty. Reject unknown references or incompatible schemas; do not persist malformed output as facts.",
+    "authority": "Models propose; deterministic application code enforces permissions, budgets, revisions and adoption. Model text cannot grant tool or execution authority.",
+    "budget": "Reserve estimated usage before concurrent dispatch, reconcile actual usage and block new paid jobs when limits are reached. Surface unknown cost where the provider cannot report it.",
+    "offline": "Existing maps and owner records remain usable without AI. New semantic work is visibly pending/unavailable; do not fabricate fallback answers.",
+    "security": "Send only permitted evidence; source text is untrusted data. Secrets are referenced through the host secret store and never stored in prompts, logs or project exports.",
+    "provider_failure": "Do not silently send code to a different provider. Fallback providers require an established data/permission policy."
+  },
+  "process_boundary": {
+    "when": "Introduce a collector process for confirmed Windows/WSL placement, parser isolation or measured responsiveness needs; otherwise use in-process adapters.",
+    "transport": "Prefer host-launched child processes with framed versioned messages over private stdio for the local/WSL case. No public listener by default.",
+    "handshake": ["protocol_version", "supported_capabilities", "collector_build", "session_id"],
+    "request_context": ["request_id", "repository_id", "allowed_root", "snapshot_or_generation", "deadline", "size_limits"],
+    "boundary": "Validate roots, message sizes and schemas on both sides; frame stdout exclusively for protocol, stderr for redacted diagnostics. Never interpolate repository paths into shell command text.",
+    "ownership": "Collector returns observations/artifacts and has no canonical database or owner-decision write access. The host validates and publishes them.",
+    "disconnect": "Timeout/cancel explicitly; retain last known state as stale and reconnect with reconciliation. Protocol version mismatch yields actionable diagnostics, not silent data loss."
+  },
+  "execution_extension": {
+    "creation_stage": "only_after_explicit_execution_scope",
+    "separation": "A future executor is a separate adapter/process consuming an explicit work specification; it is not a privilege of the analysis model.",
+    "work_spec": ["base_snapshot", "allowed_roots", "allowed_commands", "change_scope", "acceptance_criteria", "budget", "approval_policy"],
+    "change_flow": "Use an isolated checkout when appropriate; return a patch and verification evidence. Integrate through the established authority policy.",
+    "irreversibility": "Remote deployments, payments and messages cannot be undone by changing a local revision. Reconcile outcomes and use operation-specific compensation or owner decisions.",
+    "audit": "Keep execution request, permission decision, tool outcomes and subject revisions separate from inferred task status."
+  },
+  "quality_attributes": {
+    "replaceability": "A renderer or provider replacement passes unchanged boundary acceptance fixtures without altering canonical intent records.",
+    "locality": "A private implementation change touches its owner and tests. Cross-boundary changes declare affected contracts and consumers; do not enforce arbitrary file-count quotas.",
+    "recoverability": "Demonstrate fresh-profile restore, cache rebuild, interrupted job recovery and incompatible-version rejection.",
+    "freshness": "Choose measured structural/semantic refresh budgets after reference repository and hardware selection; always show age and coverage even when a target is missed.",
+    "performance": "Keep IO/AI/layout work off the UI thread; virtualize focused graphs. Choose benchmarks before accepting the graph renderer, not after adding full product scope.",
+    "maintainability": "Track recurring cross-module changes and contract churn. Revise a poor boundary rather than adding workarounds indefinitely."
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "contract_id": "taskmanagent.engineering",
+  "version": "0.3.0-design",
+  "status": "architecture_designed_open_product_inputs",
+  "implementation_authorized": false,
+  "format_note": "Product requirements and architecture entry point. The legacy v0 filename is retained as a stable entry path. Local design checks exist; product code, runtime boundary schemas and product gates remain pending implementation validation.",
+  "contract_refs": {
+    "architecture": "contracts/architecture.v1.json",
+    "evolution": "contracts/evolution.v1.json",
+    "decisions": "contracts/decisions.v1.json"
+  },
+  "authority": {
+    "confirmed_requirements": [
+      "Deliver an installed desktop program with a graphical interface.",
+      "Serve a repository owner who does not read code or routinely maintain plans.",
+      "Support understanding multiple repositories and their evolution.",
+      "Explain architecture, module boundaries, dependencies, progress and change opportunities.",
+      "Attach user ideas to relevant capabilities and modules.",
+      "Provide continuously refreshed views and navigable maps.",
+      "Support evolving plans instead of requiring a fixed implementation sequence.",
+      "Prioritize clean extension and AI implementation through explicit engineering contracts.",
+      "Discuss and establish the contract before implementing the product.",
+      "Optimize for low-cost correction, selective replacement and refactoring as ideas evolve.",
+      "Keep AI change context bounded and make affected ownership discoverable.",
+      "Support fast and deep AI capability roles without hard-coding provider identities."
+    ],
+    "proposed_decisions": [
+      "Start with local, read-only analysis of one explicitly selected repository.",
+      "Deliver a trustworthy understanding loop before automatic code execution."
+    ],
+    "architecture_selection": "Delegated architecture design is recorded in contracts/decisions.v1.json; selected-for-validation choices can be revised through contracts/evolution.v1.json.",
+    "unresolved": {
+      "desktop_os": null,
+      "repository_location_and_wsl_bridge": null,
+      "first_reference_repository": null,
+      "first_supported_languages": null,
+      "automation_authority": null,
+      "cloud_code_transmission_permission": null,
+      "ai_provider_and_budget": null,
+      "benchmark_repository_size_and_hardware": null,
+      "freshness_and_resource_budgets": null
+    },
+    "rule": "Do not treat unresolved product inputs as permission. The user delegated architectural selection; implementation and external actions remain outside this design turn. Later explicit user decisions supersede the design."
+  },
+  "product_outcome": {
+    "primary_question": "What does this project do, what actually exists, what is uncertain, and what should I decide next?",
+    "owner_responsibilities": ["Explain desired outcomes", "Resolve material product tradeoffs", "Provide necessary access and budget"],
+    "system_responsibilities": ["Collect evidence", "Explain in plain Chinese", "Maintain traceable maps", "Propose adaptable plans", "Verify claimed progress"],
+    "limits": [
+      "Static repository inspection cannot prove complete runtime behavior or production health.",
+      "Dependency edges alone do not establish harmful coupling.",
+      "AI recommendations must remain distinguishable from observations and owner decisions."
+    ]
+  },
+  "first_delivery_scope": {
+    "status": "selected_for_validation",
+    "outcome": "For one explicitly selected repository, the owner can understand supported capabilities and dependencies, inspect their evidence and uncertainty, and retain a revisioned idea or adopted explanation across refresh and restart.",
+    "includes": ["One selected source language", "Read-only local collection", "Focused desktop map and list/detail alternative", "Evidence drill-down", "Revisioned ideas and evidence-backed adoption", "Explicit partial, stale and unavailable states"],
+    "deferred": ["Broad multi-repository and multi-language coverage", "Plan/task execution", "Code modification", "Deployment control", "General plugin infrastructure"],
+    "success_checks": [
+      "Against reviewed examples, report supported direct dependencies and avoid inventing dynamic targets or runtime status.",
+      "Explain likely capabilities in plain Chinese as interpretations, with inspectable supporting evidence and limitations; valid evidence IDs alone do not prove a statement is supported.",
+      "Capture an idea without requiring a source attachment; attached notes survive reanalysis or remain explicitly unresolved after an ambiguous split/merge.",
+      "Adopt an explanation with its exact output, permitted evidence and revisions retained together; a failed adoption leaves no partially adopted record.",
+      "Refresh and restart preserve owner records; old jobs cannot overwrite a newer view, and an unavailable AI provider leaves existing work usable."
+    ],
+    "quality_fixture_ref": "contracts/fixtures/understanding.v1.json",
+    "scenario_refs": ["S01", "S02", "S03", "S04", "S07", "S08", "S09", "S10", "S13", "S14", "S15"],
+    "acceptance_inputs": ["desktop_os", "repository_location_and_wsl_bridge", "first_reference_repository", "first_supported_languages", "benchmark_repository_size_and_hardware", "freshness_and_resource_budgets"],
+    "input_rule": "Synthetic examples permit local design validation without selecting a real repository or product language. Confirm the dependent inputs before target-platform integration and final acceptance; AI calls additionally require explicit provider, data and budget policy."
+  },
+  "domain_model": {
+    "entities": ["Repository", "Snapshot", "Capability", "Module", "Dependency", "Evidence", "Finding", "Idea", "Decision", "PlanRevision", "WorkItem", "Verification", "DeploymentObservation"],
+    "identity": "Use stable repository-scoped IDs; preserve identity across supported renames and flag ambiguous matches.",
+    "mapping": "Capabilities and modules are many-to-many; neither directory names nor file counts define product scope.",
+    "claim_fields": ["id", "repository_id", "kind", "statement", "evidence_refs", "created_at", "limitations"],
+    "source_claim_fields": ["snapshot_id", "observed_at", "freshness", "coverage"],
+    "intent_note": "Owner intent may exist before any source snapshot or evidence; preserve its own revision and author instead of fabricating source provenance.",
+    "claim_kinds": ["observation", "inference", "user_intent", "recommendation"],
+    "evidence": "Include source locator, source revision or content hash, acquisition time, analyzer version and applicable scope.",
+    "uncertainty": "Show unknown, unsupported, partial, stale and failed explicitly. Never substitute a confident narrative for missing evidence.",
+    "inferences": "Include rationale, alternatives where material and qualitative uncertainty. Do not invent numerical confidence.",
+    "history": "Preserve decision and plan revision history; derived indexes may be rebuilt without losing user-authored ideas or decisions.",
+    "ownership_and_lifecycle_ref": "contracts/architecture.v1.json#/data_model"
+  },
+  "experience_invariants": [
+    "Default to capability-level Chinese explanations; code and file references are optional evidence drill-downs.",
+    "Offer project overview, focused module map, ideas and planning, and change history as views of the same model.",
+    "Use hierarchy for ownership and typed directional edges for dependencies; a mind map alone is insufficient.",
+    "Group related modules reversibly without erasing their identities or dependency direction.",
+    "Keep current implementation and desired structure visually distinguishable; editing a desired map does not change source code.",
+    "Let the owner focus on a module and its relevant neighbors without displaying the entire repository graph.",
+    "Provide a keyboard-accessible list/detail equivalent to graphical navigation; do not encode meaning by color alone.",
+    "Display each view's snapshot, freshness and analysis coverage; preserve a visibly stale last-known view during refresh failures.",
+    "An idea may remain unassigned and must not become a committed requirement automatically."
+  ],
+  "analysis_and_progress": {
+    "collection": "Inspect selected source, manifests and Git metadata through bounded local adapters; do not execute repository code to scan it.",
+    "analysis": "Use deterministic extraction for supported structural facts and optional AI interpretation for business meaning and recommendations.",
+    "coupling": "Explain the specific relationship, observed evidence, likely impact and tradeoff. Label historical co-change as association, not proof of causation.",
+    "verification_axes": ["implementation", "validation", "release", "runtime_health"],
+    "completion": "A work item is complete only relative to explicit acceptance criteria and linked verification results at a stated revision.",
+    "prohibited_progress_proxies": ["Commit count as completion", "Lines of code as completion", "AI assertions as verification", "A single unexplained project percentage"],
+    "planning": "Version plans; record why priorities changed, affected dependencies and retained or invalidated acceptance evidence. Do not require a fixed linear sequence.",
+    "work_item_fields": ["objective", "scope", "non_goals", "dependencies", "acceptance_criteria", "verification_method", "source_snapshot", "execution_authority"],
+    "production": "Report release and runtime status only when corresponding CI, deployment or telemetry evidence is connected; otherwise show unknown."
+  },
+  "architecture": {
+    "ref": "contracts/architecture.v1.json",
+    "rule": "Module ownership, dependencies, data lifecycles and runtime boundaries are defined once in the referenced contract."
+  },
+  "refresh_and_jobs": {
+    "strategy": "Incremental file and Git change detection with debouncing and reconciliation after missed events or restart.",
+    "consistency": "Tag results with snapshot and content identity; do not merge stale analysis into current facts silently.",
+    "ai_jobs": "Run interpretation asynchronously with cancellation, bounded retries, caching and configurable budget limits; do not trigger a full paid analysis on every edit.",
+    "failure": "Isolate per-repository and per-adapter failures; preserve user data and expose actionable status.",
+    "performance": "Measure structural refresh and semantic refresh separately; choose enforceable targets using the selected reference repository before implementation acceptance."
+  },
+  "access_and_execution": {
+    "default": "Local-only, read-only access to explicitly selected repositories until the owner chooses broader authority.",
+    "scan_boundary": "Exclude credentials, secret files, ignored/generated content and paths escaping the selected root by default; allow explicit bounded inclusion.",
+    "untrusted_content": "Treat source comments, repository documents and tool output as data, never as authority to change permissions or dispatch actions.",
+    "cloud": "No transmission of repository content until provider, data scope and permission are established; show and enforce configured cost limits.",
+    "commands": "Running builds, tests, hooks or package installation is execution and requires an established execution policy; reading a repository does not authorize these actions.",
+    "future_executor": "Keep code modification behind a separate adapter with explicit scope, isolation, action history and verification; deployment authority is separate.",
+    "workspace_policy": "Before implementing shared credentials, metered resources, cross-project services or platform changes, run the applicable ai-cap check. Purely local implementation is not gated."
+  },
+  "delivery_proposal": {"ref": "contracts/evolution.v1.json#/validation_sequence"},
+  "engineering_gates": {"ref": "contracts/evolution.v1.json#/architecture_gates"}
+}

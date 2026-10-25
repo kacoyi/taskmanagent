@@ -1,0 +1,57 @@
+{
+  "contract_id": "taskmanagent.fixtures.understanding",
+  "version": "1.0.0-design",
+  "status": "design_expectations_not_runtime_verified",
+  "purpose": "Concrete quality expectations for S13. Synthetic source is embedded so validation needs no managed repository, source execution or AI call.",
+  "language_scope": "Python is used only for readable synthetic examples; the first supported product language and real reference repository remain unresolved.",
+  "review_rule": "Expected statements describe meaning, not required wording. Review actual parser/model output against required facts, supporting evidence, limitations and forbidden conclusions before claiming S13 passes.",
+  "scenario_refs": ["S13"],
+  "repository_id": "synthetic-order-summary",
+  "snapshot_id": "synthetic-order-summary-v1",
+  "source_files": {
+    "app.py": "from totals import total\n\ndef summarize_orders(amounts):\n    return total(amounts)\n",
+    "totals.py": "def total(values):\n    return sum(values)\n",
+    "plugins.py": "from importlib import import_module\n\ndef load_backend(module_name):\n    return import_module(module_name)\n"
+  },
+  "evidence": [
+    {"id": "E01", "path": "app.py", "start_line": 1, "end_line": 1, "quote": "from totals import total"},
+    {"id": "E02", "path": "app.py", "start_line": 3, "end_line": 4, "quote": "def summarize_orders(amounts):\n    return total(amounts)"},
+    {"id": "E03", "path": "totals.py", "start_line": 1, "end_line": 2, "quote": "def total(values):\n    return sum(values)"},
+    {"id": "E04", "path": "plugins.py", "start_line": 1, "end_line": 4, "quote": "from importlib import import_module\n\ndef load_backend(module_name):\n    return import_module(module_name)"}
+  ],
+  "cases": [
+    {
+      "id": "Q01",
+      "question": "app.py 的直接源码依赖是什么？",
+      "expected_claims": [
+        {"kind": "observation", "status": "supported", "statement": "app.py 从 totals 模块导入 total。", "evidence_refs": ["E01"], "limitations": "仅说明静态直接导入关系。"}
+      ],
+      "must_not_claim": ["totals 依赖 app.py", "导入关系证明两个模块必须合并"]
+    },
+    {
+      "id": "Q02",
+      "question": "这个示例可能提供什么能力？",
+      "expected_claims": [
+        {"kind": "inference", "status": "supported", "statement": "从命名和计算实现看，可能提供订单金额汇总能力。", "evidence_refs": ["E02", "E03"], "limitations": "能力名称是解释；源码片段不能证明业务完整性、输入校验或生产可用性。"}
+      ],
+      "must_not_claim": ["已经实现完整订单管理系统", "已经验证订单汇总在生产环境正确运行"]
+    },
+    {
+      "id": "Q03",
+      "question": "它是否已经部署并健康运行？",
+      "expected_claims": [
+        {"kind": "inference", "status": "unknown", "statement": "现有输入无法确认部署状态和运行健康。", "evidence_refs": [], "limitations": "没有连接部署或运行观测证据；源码存在不能证明发布和健康。"}
+      ],
+      "must_not_claim": ["部署成功", "服务健康", "因为没有部署证据所以确定没有部署"]
+    },
+    {
+      "id": "Q04",
+      "question": "plugins.py 实际加载了哪些业务后端？",
+      "expected_claims": [
+        {"kind": "observation", "status": "supported", "statement": "load_backend 将传入的模块名交给 import_module。", "evidence_refs": ["E04"], "limitations": "可见动态导入调用，缺少实际传入值。"},
+        {"kind": "inference", "status": "unknown", "statement": "无法从当前输入确定具体加载的业务后端。", "evidence_refs": ["E04"], "limitations": "动态依赖目标未解析；这不表示不存在依赖。"}
+      ],
+      "must_not_claim": ["已经确定加载 PostgreSQL 后端", "plugins.py 没有任何动态依赖"]
+    }
+  ]
+}

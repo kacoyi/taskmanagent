@@ -1,0 +1,91 @@
+{
+  "contract_id": "taskmanagent.decisions",
+  "version": "1.1.0-design",
+  "record_policy": "Architecture selections requested on 2026-10-25 remain selected_for_validation; accepted records identify owner-confirmed tradeoffs. Neither status proves implementation or explicit owner selection of every technology. Supersede material decisions with rationale; preserve historical records after implementation depends on them.",
+  "decisions": [
+    {
+      "id": "ADR-001",
+      "status": "selected_for_validation",
+      "decision": "Use a local-first modular monolith with explicit external ports and feature-oriented module internals.",
+      "reason": "Bound local change and AI context while avoiding premature deployment, networking and distributed consistency costs.",
+      "alternatives": ["Microservices from the start", "Unstructured single application", "General plugin platform"],
+      "cost": "Boundaries require enforcement; a single process shares some failure and resource limits.",
+      "revisit_when": "Measured isolation, independent deployment or multi-user requirements cannot be met with a bounded worker/adapter.",
+      "reversal": "Extract a demonstrated boundary behind its existing port; migrate ownership explicitly rather than exposing internal tables.",
+      "sources": ["https://martinfowler.com/bliki/MonolithFirst.html", "https://alistair.cockburn.us/hexagonal-architecture"]
+    },
+    {
+      "id": "ADR-002",
+      "status": "selected_for_validation",
+      "decision": "Separate observations, interpretations, owner intent, plans and verification; render maps as projections.",
+      "reason": "A model update or UI rewrite must not overwrite user decisions or redefine source facts.",
+      "alternatives": ["One mutable knowledge graph for every concept", "Model conversation history as the only memory"],
+      "cost": "Explicit provenance, mapping and partial/stale states add implementation work.",
+      "revisit_when": "A concrete domain distinction has no independent lifecycle or change behavior; simplify only without losing authority/provenance separation.",
+      "reversal": "Change internal representation through versioned export/migration; preserve record identities and provenance."
+    },
+    {
+      "id": "ADR-003",
+      "status": "selected_for_validation",
+      "decision": "Use current-state records plus targeted revision/audit history, and rebuildable projections; do not event-source the entire application.",
+      "reason": "Support revisable ideas and historical evidence without making every future change depend on replaying all historical events.",
+      "alternatives": ["Full event sourcing", "Overwrite-only CRUD"],
+      "cost": "Each revisioned aggregate needs explicit history semantics and migration rules; generic time travel is not promised.",
+      "revisit_when": "A specific aggregate demonstrably needs temporal reconstruction that targeted revisions cannot support.",
+      "reversal": "Introduce event history for that aggregate through an adapter; preserve supported exports and current-state readers."
+    },
+    {
+      "id": "ADR-004",
+      "status": "selected_for_validation",
+      "decision": "Use C#/.NET for product logic, Avalonia for a desktop-rendered UI and SQLite for local state; pin supported versions at bootstrap.",
+      "reason": "A common typed language across desktop, core and collectors reduces coordination surfaces; the desktop renderer and storage remain replaceable.",
+      "alternatives": ["Python with Qt", "Rust with a desktop renderer", "Browser-based desktop shell"],
+      "cost": "Custom graph interactions, parser ecosystem coverage, platform accessibility and packaging require real prototypes; language choice alone does not ensure maintainability.",
+      "revisit_when": "The first graph/packaging/analyzer spike fails measured requirements or verified target-platform constraints make the stack unsuitable.",
+      "reversal": "Replace the failing UI or analyzer adapter first. A full language rewrite preserves exported data and behavioral fixtures but still has substantial cost.",
+      "sources": ["https://docs.avaloniaui.net/docs/welcome", "https://learn.microsoft.com/en-us/dotnet/core/deploying/"]
+    },
+    {
+      "id": "ADR-005",
+      "status": "selected_for_validation",
+      "decision": "Use one local canonical writer, SQLite transactions and a separate disposable artifact/cache boundary.",
+      "reason": "Preserve owner records atomically with minimal operations; avoid cross-OS database sharing and accidental coupling to graph/search engines.",
+      "alternatives": ["A mandatory graph server", "Separate authoritative databases per module", "Shared live JSON files as primary storage"],
+      "cost": "Write throughput is bounded; migrations, artifact consistency, export and restore still need deliberate implementation.",
+      "revisit_when": "Measured write contention or confirmed collaborative multi-user operation exceeds local single-writer requirements.",
+      "reversal": "Keep owner repository ports and portable exports, migrate through verified snapshots and designate one writer during cutover.",
+      "sources": ["https://www.sqlite.org/wal.html", "https://www.sqlite.org/backup.html"]
+    },
+    {
+      "id": "ADR-006",
+      "status": "selected_for_validation",
+      "decision": "Treat fast/deep AI as replaceable capability profiles with typed evidence-grounded output, not as authorities or separate permanent agent personalities.",
+      "reason": "Provider quality, price and availability will change; product memory and permission enforcement must survive those changes.",
+      "alternatives": ["Bind workflows to specific model names", "Let a general autonomous agent own all state", "Make AI inference mandatory for basic navigation"],
+      "cost": "Routing, evaluations, schema validation and evidence retrieval require explicit engineering; smaller models may not pass a task's quality bar.",
+      "revisit_when": "Representative evaluations show one model is simpler/better or a new role has a distinct measurable requirement.",
+      "reversal": "Change profile mapping and provider adapter; preserve accepted result snapshots, permissions and input provenance."
+    },
+    {
+      "id": "ADR-007",
+      "status": "selected_for_validation",
+      "decision": "Use staged replacement behind tested contracts, with one active writer and temporary compatibility paths.",
+      "reason": "Reduce the blast radius of incorrect decisions while keeping the old behavior available during evidence gathering.",
+      "alternatives": ["Whole-product rewrite", "Permanent dual implementation", "Freeze the first architecture forever"],
+      "cost": "Temporary duplication and migration fixtures are necessary; destructive schema changes and remote effects still have real reversal cost.",
+      "revisit_when": "An existing interface is itself wrong; version or replace the boundary instead of preserving a bad abstraction indefinitely.",
+      "reversal": "Use a tested compatible switchback or explicit forward repair; remove transitional code after its recorded retirement condition.",
+      "sources": ["https://martinfowler.com/bliki/BranchByAbstraction.html"]
+    },
+    {
+      "id": "ADR-008",
+      "status": "accepted",
+      "decision": "Prioritize inexpensive recurring changes and bounded failed experiments; make major migrations and rewrites controlled rather than promising every change is cheap.",
+      "reason": "The owner accepted this tradeoff on 2026-10-25. Speculative interfaces and perpetual compatibility add ongoing cost even when the anticipated change never occurs.",
+      "alternatives": ["Prebuild flexibility for every possible change", "Freeze initial boundaries", "Optimize only immediate implementation speed"],
+      "cost": "An unexpected or fundamental change may still require substantial redesign and migration; that cost alone does not invalidate the architecture.",
+      "revisit_when": "Actual recurring changes cross too many owners, failed experiments leave persistent burden, or a new confirmed requirement changes the expected costs.",
+      "reversal": "Revise only the demonstrated boundary and preserve owner records and relevant behavior fixtures. Remove superseded abstractions and temporary compatibility paths."
+    }
+  ]
+}
