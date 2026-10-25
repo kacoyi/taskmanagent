@@ -1,10 +1,30 @@
 # Taskmanagent architecture entry point
 
-Follow `/home/loong/ai-workspace/AGENTS.md` for shared capability policy.
+Follow applicable parent workspace instructions when present. A standalone
+clone does not require the maintainer's private workspace or tooling.
 
 This repository is in architecture design. Product implementation has not
-started. The current task authorizes design and contract maintenance, not
-automatic execution against managed repositories or paid AI services.
+started. Design/tooling maintenance and publication of this repository are
+authorized; managed-repository execution and paid AI calls require their own
+established scope.
+
+## Development workflow
+
+Read `CONTRIBUTING.md` for the human and AI development workflow. It defines
+when to commit, branch, experiment, research, ask for inputs, merge and release.
+Use short-lived task branches and PRs after bootstrap. Complete authorized
+routine work autonomously when its checks and merge conditions pass; do not
+invent extra approvals or treat a design-only request as product authorization.
+Preserve unrelated work. Report actual evidence, remaining limits and the
+resulting commit/PR. Never bypass repository protections to finish a task.
+
+For this maintainer's workspace, GitHub uses the official `gh` CLI over HTTPS.
+Before authenticated work, inspect the remote and local `github.account`;
+select that account with `gh auth switch` and verify the active login. If no
+account is pinned, obtain the owner's choice rather than guessing. Keep Git
+identity local to this clone and use a matching verified or noreply email.
+Never read credential files or print tokens. Contributors use their own forks
+and identities; no account name or credentials belong in shared Git config.
 
 ## Read only the context needed for the change
 

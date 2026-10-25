@@ -24,7 +24,8 @@ class ContractCheckerTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
         shutil.copytree(ROOT / "contracts", self.root / "contracts")
-        for relative in ("tools/check_contracts.py", "tests/test_contracts.py"):
+        for relative in ("tools/check_contracts.py", "tests/test_contracts.py", "CONTRIBUTING.md",
+                         ".github/workflows/design-checks.yml"):
             target = self.root / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / relative, target)
@@ -125,6 +126,48 @@ class ContractCheckerTests(unittest.TestCase):
     def test_gate_requires_a_check(self):
         self.edit(EVOLUTION, lambda d: d["architecture_gates"][0].pop("check"))
         self.assert_invalid("G01.check")
+
+    def test_removed_stage_gate_is_rejected(self):
+        self.edit(EVOLUTION, lambda d: d["architecture_gates"].pop(0))
+        self.assert_invalid("unknown gate_refs")
+
+    def test_unknown_stage_scenario_is_rejected(self):
+        self.edit(EVOLUTION, lambda d: d["validation_sequence"][1]["scenario_refs"].append("S999"))
+        self.assert_invalid("unknown scenario_refs")
+
+    def test_stage_references_cannot_hide_in_prose(self):
+        self.edit(EVOLUTION, lambda d: d["validation_sequence"][1].update(exit="G01 exists; S999 passes."))
+        self.assert_invalid("use structured gate_refs/scenario_refs")
+
+    def test_product_stage_cannot_omit_gate_references(self):
+        self.edit(EVOLUTION, lambda d: d["validation_sequence"][1].update(gate_refs=[]))
+        self.assert_invalid("missing gate_refs")
+
+    def test_product_stage_cannot_omit_scenario_references(self):
+        self.edit(EVOLUTION, lambda d: d["validation_sequence"][1].pop("scenario_refs"))
+        self.assert_invalid("foundation_proof.scenario_refs")
+
+    def test_implemented_gate_needs_evidence(self):
+        self.edit(EVOLUTION, lambda d: d["architecture_gates"][0].update(implementation_status="implemented"))
+        self.assert_invalid("G01.implementation_evidence_refs")
+
+    def test_implemented_gate_evidence_must_exist(self):
+        self.edit(EVOLUTION, lambda d: d["architecture_gates"][0].update(
+            implementation_status="implemented", implementation_evidence_refs=["missing-check.py"]))
+        self.assert_invalid("missing reference")
+
+    def test_implemented_gate_accepts_existing_evidence(self):
+        self.edit(EVOLUTION, lambda d: d["architecture_gates"][-1].update(
+            implementation_status="implemented", implementation_evidence_refs=["tools/check_contracts.py"]))
+        check_contracts(self.root)  # Path integrity is not a claim that the gate actually ran.
+
+    def test_missing_workflow_guide_is_rejected(self):
+        (self.root / "CONTRIBUTING.md").unlink()
+        self.assert_invalid("missing reference: CONTRIBUTING.md")
+
+    def test_missing_ci_workflow_is_rejected(self):
+        (self.root / ".github/workflows/design-checks.yml").unlink()
+        self.assert_invalid("missing reference: .github/workflows/design-checks.yml")
 
     def test_wrong_evidence_quote_is_rejected(self):
         self.edit(FIXTURE, lambda d: d["evidence"][0].update(quote="from invented import backend"))

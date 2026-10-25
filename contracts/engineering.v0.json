@@ -1,13 +1,14 @@
 {
   "contract_id": "taskmanagent.engineering",
-  "version": "0.3.0-design",
+  "version": "0.4.0-design",
   "status": "architecture_designed_open_product_inputs",
   "implementation_authorized": false,
   "format_note": "Product requirements and architecture entry point. The legacy v0 filename is retained as a stable entry path. Local design checks exist; product code, runtime boundary schemas and product gates remain pending implementation validation.",
   "contract_refs": {
     "architecture": "contracts/architecture.v1.json",
     "evolution": "contracts/evolution.v1.json",
-    "decisions": "contracts/decisions.v1.json"
+    "decisions": "contracts/decisions.v1.json",
+    "development_workflow": "CONTRIBUTING.md"
   },
   "authority": {
     "confirmed_requirements": [
@@ -40,7 +41,8 @@
       "benchmark_repository_size_and_hardware": null,
       "freshness_and_resource_budgets": null
     },
-    "rule": "Do not treat unresolved product inputs as permission. The user delegated architectural selection; implementation and external actions remain outside this design turn. Later explicit user decisions supersede the design."
+    "repository_publication": {"visibility": "public", "owner": "kacoyi", "name": "taskmanagent", "license": "MIT", "authorization": "The owner requested publication and a complete AI development workflow on 2026-10-25 and selected the kacoyi account. Repository engineering and publication do not authorize execution against managed repositories or paid AI calls."},
+    "rule": "Do not treat unresolved product inputs as permission. Design, local tooling and repository engineering/publication are authorized. Product implementation requires its own subsequent task scope; external integrations require established access, data and budget policy. Later explicit user decisions supersede the design."
   },
   "product_outcome": {
     "primary_question": "What does this project do, what actually exists, what is uncertain, and what should I decide next?",
